@@ -42,4 +42,17 @@ public interface OverdoseSpecificDrugRepository extends JpaRepository<OverdoseSp
   );
 
   List<String> findDistinctDrugInvolvedBy();
+
+  @Query("""
+    SELECT d.jurisdiction, SUM(d.deathCount) as totalDeaths
+    FROM OverdoseSpecificDrug d
+    WHERE d.drugInvolved = :drug
+    AND d.deathYear = :year
+    GROUP BY d.jurisdiction
+    ORDER BY SUM(d.deathCount) DESC
+""")
+  List<Object[]> findDeathsByJurisdictionAndDrug(
+      @Param("drug") String drug,
+      @Param("year") Integer year
+  );
 }
